@@ -1,27 +1,25 @@
 <template>
     <div>
-        <div class="container">
-            <div class="row">
-                <div class="col-4">
-                    <div class="list-group" id="list-tab" role="tablist">
-                        <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list"
-                           href="#list-home" role="tab" aria-controls="home">All Blogs</a>
-                    </div>
+        <div class="service-container">
+            <template v-for="(blog, index) in blogList">
+                <div class="singleservice" v-bind:key="index">
+                    <img class="serviceicon"
+                         src="http://www.freeiconspng.com/uploads/book-stack-icon--icon-search-engine-16.png">
+                    <h2 class="servicetitle">
+                        <a style="cursor: pointer" @click="redirectDetail(blog.id)">
+                            {{blog.title}}
+                        </a>
+                    </h2>
+                    {{ blog.content }}
                 </div>
-                <div>
-                    <ul class="list-group">
-                        <li class="list-group-item" v-for="(blog,index) in blogList" v-bind:key="index">
-                            <a href="#" @click="redirectDetail(blog.id)">{{ blog.title }}</a></li>
-                    </ul>
-
-                </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
+import store from '../store'
 
 export default {
   name: 'BlogIndex',
@@ -31,6 +29,7 @@ export default {
     }
   },
   created () {
+    axios.defaults.headers.common['Authorization'] = 'Token ' + store.state.tokenData
     axios.get('http://localhost:8000/blogs/')
       .then((response) => {
         this.blogList = response.data
@@ -48,83 +47,84 @@ export default {
 </script>
 
 <style scoped>
-    .container {
-        padding: 40px;
+    body {
+        margin: 0px;
+        padding-left: 50px;
+        padding-right: 50px;
     }
 
-    .page-header {
-        font-size: 30px;
-        font-style: oblique;
-        color: brown;
+    .services-wrapper {
+        width: auto;
+        min-height: 400px;
+        padding: 25px;
     }
 
-    .comment-container {
-        position: relative;
-        max-width: 700px;
-        margin: 50px auto;
-        overflow: hidden;
-        font-family: serif;
+    .service-container {
+        text-align: center;
+        margin-top: 25px;
     }
 
-    .meta {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-    }
-
-    .avatar {
-        border-radius: 50%;
-        width: 40px;
-    }
-
-    .name {
-        margin-left: 5px;
-        transform: translateY(-100px);
+    .singleservice {
         display: inline-block;
-        color: #2d69eb;
-        transition: all 0.3s;
+        width: 25%;
+        height: 100%;
+        background-color: #f3f3f3;
+        padding: 25px;
+        color: #b2b2b2;
+        font-family: avenir;
+        text-align: left;
+        margin-bottom: 15px;
+        padding: 40px;
+        margin-left: 5px;
+        margin-right: 5px;
+        border-bottom: 5px solid skyblue;
+        border-radius: 10px;
     }
 
-    .placeholder {
-        position: absolute;
-        top: 50%;
-        font-size: 18px;
-        color: #999999;
-        left: 60px;
-        margin-top: -15px;
+    .singleserviceb {
+        display: inline-block;
+        width: 25%;
+        height: 100%;
+        background-color: #f3f3f3;
+        padding: 25px;
+        color: #b2b2b2;
+        font-family: avenir;
+        text-align: left;
+        margin-bottom: 15px;
+        padding: 40px;
+        margin-left: 5px;
+        margin-right: 5px;
+        border-bottom: 5px solid orange;
+        border-radius: 10px;
     }
 
-    textarea {
-        height: 70px;
-        transition: all 0.3s;
-        font-size: 18px;
-        box-sizing: border-box;
-
-        color: #ffffff;
+    @media (max-width: 500px) {
+        .singleservice, .singleserviceb {
+            width: 100%;
+        }
     }
 
-    .btns {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
+    h2.servicetitle {
+        font-family: century gothic;
+        font-size: 16pt;
+        font-weight: normal;
+        letter-spacing: 1px;
+        padding-bottom: 0px;
+        text-align: center;
+        text-transform: uppercase;
+        color: #8c8c8c;
     }
 
-    textarea {
-        height: 50px;
-        color: #444;
-        padding-top: 60px;
-        padding-bottom: 40px;
+    img.serviceicon {
+        width: 20%;
+        height: auto;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-bottom: 15px;
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+        opacity: .5;
     }
 
-    .placeholder {
-        display: none;
-    }
-
-    .btns {
-        opacity: 1;
-        visibility: visible;
-    }
 </style>

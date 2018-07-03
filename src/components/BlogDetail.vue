@@ -1,136 +1,141 @@
 <template>
-    <div class="service-container">
-        <div class="singleservice">
-            <img class="serviceicon"
-                 src="http://www.freeiconspng.com/uploads/book-stack-icon--icon-search-engine-16.png">
-            <h2 class="servicetitle">
-                Book Covers
-            </h2>
-            E-book or print, my goal is to make a captivating image that is true to your novel.
-        </div>
-        <div class="singleserviceb">
-            <img class="serviceicon" src="http://free-icon-rainbow.com/i/icon_00079/icon_000790_256.png">
-            <h2 class="servicetitle">
-                VECTOR GRAPHICS
-            </h2>
-            From app icons to illustrations, look sharp with scalable, crisp, and lively graphics.
-        </div>
-        <div class="singleservice">
-            <img class="serviceicon"
-                 src="http://www.iconninja.com/files/642/213/85/idea-and-creativity-symbol-of-a-lightbulb-icon.svg">
-            <h2 class="servicetitle">
-                BRANDING
-            </h2>
-            Logos, business cards, signage, or social media, let's build an adventure.
-        </div>
-        <div class="singleserviceb">
-            <img class="serviceicon" src="http://www.clipartbest.com/cliparts/Kin/L9M/KinL9MRzT.png">
-            <h2 class="servicetitle">
-                VOICEOVER
-            </h2>
-            E-book or print, my goal is to make a captivating image that is true to your novel.
-        </div>
-        <div class="singleservice">
-            <img class="serviceicon" src="http://simpleicon.com/wp-content/uploads/computer-2.png">
-            <h2 class="servicetitle">
-                Web Design
-            </h2>
-            From app icons to illustrations, look sharp with scalable, crisp, and lively graphics.
-        </div>
-        <div class="singleserviceb">
-            <img class="serviceicon" src="http://www.pngmart.com/files/1/Video-Icon-PNG-Clipart.png">
-            <h2 class="servicetitle">
-                MOTION DESIGN
-            </h2>
-            Logos, business cards, signage, or social media, let's build an adventure.
-        </div>
+    <div class="container">
+        <template v-for="(article, index) in articleList">
+            <div class="panel panel-primary" v-bind:key="index">
+                <div class="panel-heading " role="tab" :id="'heading'+index">
+                    <h4 class="panel-title">
+                        <a @click="likeArticle(article.id)" class="btn btn-success btn-sm pull-right"
+                           style="position: relative; top: -5px">
+                            <span class="glyphicon glyphicon-thumbs-up">
+                            </span>{{article.has_user_liked? 'Unlike':'Like'}}
+                        </a>
+                        <a role="button" data-toggle="collapse" :href="'#collapse'+index" aria-expanded="true"
+                           :aria-controls="'collapse'+index" class="trigger collapsed">
+                            {{article.name}}
+                        </a>
+                    </h4>
+                </div>
+                <div :id="'collapse'+index" class="panel-collapse collapse" role="tabpanel"
+                     :aria-labelledby="'heading'+index">
+                    <div class="panel-body">
+                        <h4 style="margin-bottom: 50px; font-family: fantasy">{{article.content}}</h4>
+                        <div class="pull-right">
+                            <p>Publish Status:<a style="cursor: pointer"
+                                                 @click="changeStatus(article.id, {'is_published': !article.is_published})">{{article.is_published?
+                                'Published':'Unpublished'}}</a></p>
+                            <p>Archive Status:<a style="cursor: pointer"
+                                                 @click="changeStatus(article.id, {'is_archived': !article.is_archived})">{{article.is_archived?
+                                'Archived':'Unarchived'}}</a></p>
+                            <p>Author:{{article.author_name}}</p>
+                            <p>Created At:{{article.created_at}}</p>
+                        </div>
+                        <div class="col-lg-6">
+                            <div style="margin-bottom: 30px">
+                            <h3>Comments</h3>
+                            <template v-for="(comment, index) in article.comments">
+                            <p v-bind:key="index">
+                                {{comment.commented_by_name}}=> {{comment.content}}
+                                <a>Delete</a>
+                            </p>
+                            </template>
+                            </div>
+                            <h4 class="heading" style="color: darkred">Add A Comment Below</h4>
+                            <form>
+                                <div class="form-group">
+                                    <textarea class="form-control status-box" rows="3"
+                                              placeholder="Enter your comment here..."></textarea>
+                                </div>
+                            </form>
+                            <div class="button-group pull-right">
+                                <a @click="postComment(article.id)" style="cursor:pointer;" class="btn btn-primary">Post</a>
+                            </div>
+                            <ul class="posts">
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+        </template>
     </div>
 </template>
 
 <script>
-  export default {
-    name: "BlogDetail"
+import axios from 'axios'
+import store from '../store'
+
+export default {
+  name: 'BlogDetail',
+  props: ['id'],
+  data () {
+    return {
+      articleList: null
+    }
+  },
+  created () {
+    axios.defaults.headers.common['Authorization'] = 'Token ' + store.state.tokenData
+    this.getArticle()
+  },
+  methods: {
+    getArticle () {
+      axios.get(`http://localhost:8000/blog/${this.id}/articles/`)
+        .then((response) => {
+          this.articleList = response.data
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    changeStatus (articleId, data) {
+      axios.patch(`http://localhost:8000/blog/${this.id}/articles/${articleId}/`, data)
+        .then((response) => {
+          this.getArticle()
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    likeArticle (id) {
+      axios.post(`http://localhost:8000/article/${id}/like/`)
+        .then((response) => {
+          this.getArticle()
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    postComment (id) {
+      console.log(this.articleList)
+    }
   }
+}
 </script>
 
 <style scoped>
     body {
-        margin: 0px;
-        padding-left: 50px;
-        padding-right: 50px;
+        margin: 50px;
     }
 
-    .services-wrapper {
-        width: auto;
-        min-height: 400px;
-        padding: 25px;
+    a:hover, a:visited, a:link, a:active {
+        text-decoration: none;
     }
 
-    .service-container {
-        text-align: center;
-        margin-top: 25px;
+    .controls {
+        margin-bottom: 10px;
     }
 
-    .singleservice {
-        display: inline-block;
-        width: 25%;
-        height: 100%;
-        background-color: #f3f3f3;
-        padding: 25px;
-        color: #b2b2b2;
-        font-family: avenir;
-        text-align: left;
-        margin-bottom: 15px;
-        padding: 40px;
-        margin-left: 5px;
-        margin-right: 5px;
-        border-bottom: 5px solid skyblue;
-        border-radius: 10px;
+    .collapse-group {
+        padding: 10px;
+        border: 1px solid darkgrey;
+        margin-bottom: 10px;
     }
 
-    .singleserviceb {
-        display: inline-block;
-        width: 25%;
-        height: 100%;
-        background-color: #f3f3f3;
-        padding: 25px;
-        color: #b2b2b2;
-        font-family: avenir;
-        text-align: left;
-        margin-bottom: 15px;
-        padding: 40px;
-        margin-left: 5px;
-        margin-right: 5px;
-        border-bottom: 5px solid orange;
-        border-radius: 10px;
+    .panel-title .trigger:before {
+        content: '\e082';
+        font-family: 'Glyphicons Halflings';
+        vertical-align: text-bottom;
     }
 
-    @media (max-width: 500px) {
-        .singleservice, .singleserviceb {
-            width: 100%;
-        }
-    }
-
-    h2.servicetitle {
-        font-family: century gothic;
-        font-size: 16pt;
-        font-weight: normal;
-        letter-spacing: 1px;
-        padding-bottom: 0px;
-        text-align: center;
-        text-transform: uppercase;
-        color: #8c8c8c;
-    }
-
-    img.serviceicon {
-        width: 20%;
-        height: auto;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        padding-bottom: 15px;
-        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-        filter: grayscale(100%);
-        opacity: .5;
+    .panel-title .trigger.collapsed:before {
+        content: '\e081';
     }
 </style>
