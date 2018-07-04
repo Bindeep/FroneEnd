@@ -40,6 +40,7 @@ export default {
   },
   methods: {
     redirectDetail (id) {
+      this.$emit('catchId', id)
       this.$router.push(`/blog/${id}/`)
     }
   }

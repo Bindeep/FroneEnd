@@ -41,6 +41,12 @@
 <script>
 export default {
   name: 'navbar',
+  // props: ['id'],
+  data () {
+    return {
+      id: null
+    }
+  },
   methods: {
     goLogin () {
       this.$router.push('/login')
@@ -49,7 +55,10 @@ export default {
       this.$router.push('/')
     },
     goPost () {
-      this.$router.push('/post/')
+      this.$router.push(`/blog/post/${this.id}/`)
+    },
+    catchId (id) {
+      this.id = id
     }
   }
 }

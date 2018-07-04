@@ -32,9 +32,10 @@ export default new Router({
       props: true
     },
     {
-      path: '/post/',
+      path: '/blog/post/:id',
       name: 'postArticle',
-      component: ArticlePost
+      component: ArticlePost,
+      props: true
     }
   ],
   mode: 'history'

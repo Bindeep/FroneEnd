@@ -16,6 +16,11 @@ export default {
   router: router,
   components: {
     navbar
+  },
+  methods: {
+    catchId (id) {
+      alert(id)
+    }
   }
 }
 </script>

@@ -32,10 +32,12 @@
                         <div class="col-lg-6">
                             <div style="margin-bottom: 30px">
                             <h3>Comments</h3>
-                            <template v-for="(comment, index) in article.comments">
+                            <template v-for="(comment, index) in article.article_comments">
                             <p v-bind:key="index">
                                 {{comment.commented_by_name}}=> {{comment.content}}
-                                <a>Delete</a>
+                                <template v-if="comment.is_user_comment | Superuser">
+                                    <a v-on:click="deleteComment(comment.id)" style="cursor: pointer">Delete</a>
+                                </template>
                             </p>
                             </template>
                             </div>
@@ -43,11 +45,11 @@
                             <form>
                                 <div class="form-group">
                                     <textarea class="form-control status-box" rows="3"
-                                              placeholder="Enter your comment here..."></textarea>
+                                              placeholder="Enter your comment here..." v-model="comment"></textarea>
                                 </div>
                             </form>
                             <div class="button-group pull-right">
-                                <a @click="postComment(article.id)" style="cursor:pointer;" class="btn btn-primary">Post</a>
+                                <a @click="postComment(article.id, comment)" style="cursor:pointer;" class="btn btn-primary">Post</a>
                             </div>
                             <ul class="posts">
                             </ul>
@@ -68,11 +70,14 @@ export default {
   props: ['id'],
   data () {
     return {
-      articleList: null
+      articleList: null,
+      Superuser: null,
+      comment: null
     }
   },
   created () {
     axios.defaults.headers.common['Authorization'] = 'Token ' + store.state.tokenData
+    this.Superuser = store.state.Superuser
     this.getArticle()
   },
   methods: {
@@ -80,6 +85,7 @@ export default {
       axios.get(`http://localhost:8000/blog/${this.id}/articles/`)
         .then((response) => {
           this.articleList = response.data
+          console.log(response.data)
         })
         .catch((error) => {
           alert(error)
@@ -103,8 +109,23 @@ export default {
           alert(error)
         })
     },
-    postComment (id) {
-      console.log(this.articleList)
+    postComment (id, comment) {
+      axios.post(`http://localhost:8000/article/${id}/comment/`, {content: comment})
+        .then((response) => {
+          this.getArticle()
+        })
+        .catch((error) => {
+          alert(error)
+        })
+    },
+    deleteComment (id) {
+      axios.delete(`http://localhost:8000/comment/${id}/delete/`)
+        .then((response) => {
+          this.getArticle()
+        })
+        .catch((error) => {
+          alert(error)
+        })
     }
   }
 }

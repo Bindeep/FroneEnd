@@ -40,7 +40,7 @@ export default {
     loginUser () {
       axios.post('http://localhost:8000/api-token-auth/', {'username': this.username, 'password': this.password})
         .then((response) => {
-          store.commit('setToken', response.data.token)
+          store.commit('setToken', response.data)
           this.$router.push('/')
         })
         .catch((error) => {
